@@ -1,0 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+from app import engine
+
+if __name__ == "__main__":
+    if engine.config["DEBUG"] == False:
+        import logging
+        log = logging.getLogger('werkzeug')
+        log.disabled = True
+        engine.logger.disabled = True
+
+    engine.run('0.0.0.0', port=engine.config["PORT"])
