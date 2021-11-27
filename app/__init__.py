@@ -13,5 +13,6 @@ engine.config["PORT"] = 9600
 
 ABSPATH = os.path.dirname(__file__)
 DATA_FOLDER = os.path.join(ABSPATH,"data")
+ADMIN_KEY = 'admin_key_here'
 
 from .views import *

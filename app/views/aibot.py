@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from app import engine, DATA_FOLDER
+from app import engine, DATA_FOLDER, ADMIN_KEY
 from flask import jsonify, request
 import os, json
+from .util import check_token
 
 @engine.route("/", methods=['GET','POST'])
 def eliza():
@@ -28,6 +29,12 @@ def eliza_reply():
 
 @engine.route("/api/intent", methods=['POST'])
 def eliza_intent():
+    token = request.args.get('token','').strip()
+    if not check_token(token):
+        return jsonify({
+            'error':'Token is required'
+        })
+
     if not request.content_type or not ("application/json" in request.content_type):
         return jsonify({
             'error':'Method is not allow, must be POST and content type is application/json'
@@ -124,4 +131,47 @@ def eliza_intent():
 
     return jsonify({
         'intent':intent
+    })
+
+@engine.route("/api/token", methods=['GET', 'POST'])
+def add_token():
+    if request.method == "POST":
+        req = request.form
+    else:
+        req = request.args
+
+    auth = req.get('auth','').strip()
+    if not auth or auth != ADMIN_KEY:
+        return jsonify({
+            'error':'Access Denied'
+        })
+
+    token = req.get('token','').strip()
+    if len(token) < 16:
+        return jsonify({
+            'error':'Token is not valid'
+        })
+
+    try:
+        tokens = []
+        token_file = os.path.join(DATA_FOLDER, 'tokens.json')
+        if os.path.isfile(token_file):
+            with open(token_file,'r') as f:
+                tokens = json.load(f)
+
+        if not isinstance(tokens, list):
+            tokens = []
+
+        if token not in tokens:
+            tokens.append(token)
+            with open(token_file,'w') as f:
+                f.write(json.dumps(tokens, ensure_ascii=False))
+
+    except Exception as e:
+        return jsonify({
+            'error':str(e)
+        })
+
+    return jsonify({
+        'token':token
     })
