@@ -18,5 +18,6 @@ ADMIN_KEY = 'admin_key_here'
 INTENTS_FILE = os.path.join(DATA_FOLDER, 'intents.json')
 TOKENS_FILE = os.path.join(DATA_FOLDER, 'tokens.json')
 MODEL_PICKLE = os.path.join(DATA_FOLDER, 'model.pkl')
+DATA_PICKLE = os.path.join(DATA_FOLDER, 'data.pkl')
 
 from .views import *
