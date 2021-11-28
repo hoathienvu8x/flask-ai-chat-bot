@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from app import DATA_FOLDER
+from app import TOKENS_FILE
 import os, json
 
 def check_token(token):
@@ -9,8 +9,7 @@ def check_token(token):
         return False
 
     tokens = []
-    token_file = os.path.join(DATA_FOLDER, 'tokens.json')
-    if not os.path.isfile(token_file):
+    if not os.path.isfile(TOKENS_FILE):
         return False
 
     with open(token_file,'r') as f:

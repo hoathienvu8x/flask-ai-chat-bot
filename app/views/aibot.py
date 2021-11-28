@@ -1,9 +1,17 @@
 # -*- coding: utf-8 -*-
 
-from app import engine, DATA_FOLDER, ADMIN_KEY
+from app import engine, ADMIN_KEY, MODEL_PICKLE, TOKENS_FILE, INTENTS_FILE
 from flask import jsonify, request
-import os, json
+import os, json, pickle
 from .util import check_token
+
+model = None
+
+try:
+    with open(MODEL_PICKLE, 'rb') as f:
+        model = pickle.load(f)
+except:
+    model = None
 
 @engine.route("/", methods=['GET','POST'])
 def eliza():
@@ -86,10 +94,9 @@ def eliza_intent():
         intent['context_set'] = [ s.strip() for s in intent['context_set'] if s.strip() ]
 
     try:
-        intents_file = os.path.join(DATA_FOLDER, 'intents.json')
         intents = []
-        if os.path.isfile(intents_file):
-            with open(intents_file, 'r') as f:
+        if os.path.isfile(INTENTS_FILE):
+            with open(INTENTS_FILE, 'r') as f:
                 intents = json.load(f)
 
         if not intents or not isinstance(intents,list):
@@ -122,7 +129,7 @@ def eliza_intent():
 
             if not found:
                 intents.append(intent)
-        with open(intents_file,'w') as f:
+        with open(INTENTS_FILE,'w') as f:
             f.write(json.dumps(intents, ensure_ascii=False))
     except Exception as e:
         return jsonify({
@@ -154,9 +161,8 @@ def add_token():
 
     try:
         tokens = []
-        token_file = os.path.join(DATA_FOLDER, 'tokens.json')
-        if os.path.isfile(token_file):
-            with open(token_file,'r') as f:
+        if os.path.isfile(TOKENS_FILE):
+            with open(TOKENS_FILE,'r') as f:
                 tokens = json.load(f)
 
         if not isinstance(tokens, list):
@@ -164,7 +170,7 @@ def add_token():
 
         if token not in tokens:
             tokens.append(token)
-            with open(token_file,'w') as f:
+            with open(TOKENS_FILE,'w') as f:
                 f.write(json.dumps(tokens, ensure_ascii=False))
 
     except Exception as e:
